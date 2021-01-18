@@ -1,0 +1,112 @@
+ZIP & UNZIP = non-binary, standard compression & uncompression
+              minimum program requirements
+./ZIP sample1 = creates a sample1.zip compressed file & deletes sample1
+./UNZIP sample1.zip = uncompress sample1.zip to sample1
+
+c++ -c huffman.cpp
+c++ zip.cpp huffman.o
+c++ unzip.cpp
+
+1) How to zip file and encoding table for "MERCER TENNIS" would look.
+
+The zip file will contain a header follwed by the compressed data in binary.
+The header contains an integer representing the number of characters in the 
+source file on a single line. It is follwed by a line for each character
+and its corresponding compressed string. Each line has an integer representing 
+the ASCII value of the character, and then a string representing that character's
+compressed string. This is follwed by the compressed data in binary.
+
+The zip file for "MERCER TENNIS" looks as follows-
+
+10          \\number of unique characters
+10 1010     \\ASCII value for newLine
+32 1011     \\ASCII value for space
+67 1100     \\ASCII value for C
+69 00       \\ASCII value for E
+73 1101     \\ASCII value for I
+77 1110     \\ASCII value for M
+78 011      \\ASCII value for N
+82 100      \\ASCII value for R
+83 1111     \\ASCII value for S
+84 010      \\ASCII value for T
+111000100110000100101101000011011110111111010       \\compressed data in binary
+
+The encoding table contains the all characters in the source file. These characters
+are then indexed starting at 0 to 2C-1, where C is the number of characters. The 
+table also includes the weight of the characters, which is the sum of the weights 
+of the subtrees. The weights of the leafs are the frequencies of the characters. 
+The parents of the character is also included in the table. The index is used to 
+represent the parent. Lastly, the tbale inlcudes the characters Child Type. All 
+left links are labed as 0, and all right links are labeled with 1. All letters 
+have a unique encoding consinsiting of 0's and 1's. This can be found by starting 
+at the root and keeping track of the the child type of each parent until the 
+character is reached. 
+
+The encoding table for "MERCER TENNIS" looks as follows-
+
+            +++ Encoding Table +++
+    Index   Char    Weight  Parent  Child Type
+    0       M       1       12      0
+    1       E       3       16      1
+    2       R       2       14      0
+    3       C       1       11      0
+    4       T       1       13      0
+    5       N       2       13      1
+    6       I       1       11      1
+    7       S       1       12      1
+    8       Sp      1       10      1
+    9       nL      1       10      0
+    10      T1      2       15      0
+    11      T2      2       15      1
+    12      T3      2       14      1
+    13      T4      3       16      0
+    14      T5      4       17      1
+    15      T6      4       17      0
+    16      T7      6       18      1
+    17      T8      8       18      0
+    18      T9      14      0       N/A
+
+2) A breakdown of how the greedy Huffman algorithm would be used to from a 
+Huffman tree.
+
+Steps in Huffman Encoding on a Sample Text File- 
+(Taken from Huffman Encoding Algorithm PowerPoint from class)
+    1) Start with a forest of all your frequency nodes.
+    2) Merge the smallest two frequencies. If there is a tie, choose between the 
+    two. Form a weighted total node for those two frequencies and label it as T1.
+    3) Continue step 2 including your total nodes until all chars have a total node
+    as a parent. 
+    4) Form a trie (a tree where left and right links get binary weights). Label all 
+    left links with 0's, and all right links labeled with 1's. 
+
+3) How the Huffman class is set up and can be used to help you.
+
+The Huffman class will use the Huffman Encoding algorithm and will be used to create 
+a Huffman tree. The Huffman tree will help create the Encoding Table, which will give
+allow us to assign the characters to a string that uses less bits per character. The 
+more frequently used characters will have a smaller string of codes than less frequently
+used characters, which will reduce the size of the file. 
+
+The Huffman class includes the following public functions-
+    -void insert(char ch, int weight):
+        Inserts a character and its associated weight into a node of the Huffman tree.
+    -bool inTree(char ch):
+        Returns a boolean value indicating whether a given character is stored in the tree.
+    -int GetFrequency(char ch):
+        Returns the weight of a given character.
+    -void build():
+        Builds the Huffman Tree.
+    -string GetCode(char ch):
+        Returns the compressed code of a given character in the tree using recursion.
+    -void PrintTable():
+        Displays the Huffman encoding table used in the compression process.
+    -int numNodes():
+        Returns the number of nodes currenlty in the Huffman Tree. 
+
+The Huffman class includes the following private functions-
+    -int lookUp(char ch):
+        Returns the index of a given character in the tree.
+    -int GetFrequency(int i): 
+        Returns the weight of a given index.
+    -string GetCode(int i):
+        Returns the compressed code of the characters at a given index.
